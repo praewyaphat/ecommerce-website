@@ -56,11 +56,15 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!keyword) return;
 
         fetch(`http://localhost:3000/search?keyword=${encodeURIComponent(keyword)}`)
-          .then(res => res.json())
-          .then(renderProducts)
-          .catch(err => console.error("ค้นหาไม่สำเร็จ:", err));
-
-        document.querySelector(".search-model")?.classList.remove("active");
+        .then(res => res.json())
+        .then(products => {
+            renderProducts(products);
+            // ปิด popup 
+            document.querySelector(".search-model")?.classList.remove("active");
+            document.body.classList.remove("search-show");
+            document.querySelector(".search-model").style.display = "none";
+        })
+        .catch(err => console.error("ค้นหาไม่สำเร็จ:", err));
       }
     });
   }
