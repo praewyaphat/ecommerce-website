@@ -28,7 +28,7 @@ const sampleData = [
   ['Backpack', 60.90, 'bags', 'img/product/product-11.jpg'],
   ['Hoody', 98.49, 'clothing', 'img/product/product-12.jpg'],
   ['Work Briefcase', 49.66, 'bags', 'img/product/product-13.jpg'],
-  ['Glasses', 26.28, 'clothing', 'img/product/product-12.jpg']
+  ['Glasses', 26.28, 'glasses', 'img/product/product-14.jpg']
 ];
 sampleData.forEach(row => insert.run(...row));
 
