@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const searchInput = document.getElementById("search-input");
 
   function renderProducts(products) {
+    console.clear();
+    console.log("✅ แสดงสินค้าใหม่", products);
     productList.innerHTML = "";
 
     if (!Array.isArray(products)) {
@@ -17,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     products.forEach(p => {
-      productList.innerHTML += `
+      productList.insertAdjacentHTML("beforeend", `
         <div class="col-lg-4 col-md-6 col-sm-6">
           <div class="product__item">
             <div class="product__item__pic set-bg" data-setbg="${p.image}">
@@ -33,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
           </div>
         </div>
-      `;
+      `);
     });
 
     document.querySelectorAll(".set-bg").forEach(el => {
@@ -43,9 +45,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // โหลดสินค้าทั้งหมด
   fetch("http://localhost:3000/products")
-    .then(res => res.json())
-    .then(renderProducts)
-    .catch(err => console.error("โหลดสินค้าไม่สำเร็จ:", err));
+    .then(res => {
+      if (!res.ok) throw new Error("โหลดไม่ได้: " + res.status);
+      return res.json();
+    })
+    .then(data => {
+      renderProducts(data);
+    })
+    .catch(err => {
+      console.error("โหลดสินค้าไม่สำเร็จ:", err);
+      renderProducts([]); // ป้องกัน render ซ้ำ
+    });
 
   // ค้นหาจากช่องค้นหา popup
   if (searchInput) {
@@ -56,15 +66,17 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!keyword) return;
 
         fetch(`http://localhost:3000/search?keyword=${encodeURIComponent(keyword)}`)
-        .then(res => res.json())
-        .then(products => {
+          .then(res => res.json())
+          .then(products => {
             renderProducts(products);
-            // ปิด popup 
             document.querySelector(".search-model")?.classList.remove("active");
             document.body.classList.remove("search-show");
             document.querySelector(".search-model").style.display = "none";
-        })
-        .catch(err => console.error("ค้นหาไม่สำเร็จ:", err));
+          })
+          .catch(err => {
+            console.error("ค้นหาไม่สำเร็จ:", err);
+            renderProducts([]);
+          });
       }
     });
   }
