@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, '../')));
 const db = new Database(path.join(__dirname, '../products.db'));
 
 
-// ----------------- API ----------------- //
+// ----------------- API colin  ----------------- //
 
 // ดึงสินค้าทั้งหมด หรือกรองตามหมวดหมู่
 app.get('/products', (req, res) => {
