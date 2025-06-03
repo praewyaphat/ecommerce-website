@@ -1,3 +1,4 @@
+// colin
 document.addEventListener("DOMContentLoaded", function () {
   const productList = document.getElementById("product-list");
   const searchInput = document.getElementById("search-input");
