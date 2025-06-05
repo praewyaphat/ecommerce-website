@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // โหลดสินค้าทั้งหมด
-  fetch("http://localhost:3000/products")
+  fetch("http://localhost:3000/api/products")
     .then(res => {
       if (!res.ok) throw new Error("โหลดไม่ได้: " + res.status);
       return res.json();
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const keyword = searchInput.value.trim();
         if (!keyword) return;
 
-        fetch(`http://localhost:3000/search?keyword=${encodeURIComponent(keyword)}`)
+        fetch(`http://localhost:3000/api/search?keyword=${encodeURIComponent(keyword)}`)
           .then(res => res.json())
           .then(products => {
             renderProducts(products);
