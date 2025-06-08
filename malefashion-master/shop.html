@@ -451,6 +451,56 @@
 
     <script src="js/product-fetch.js"></script>
 
+        <!-- ... โค้ด HTML อื่นๆ ของ shop.html ... -->
+
+    <!-- เพิ่มโค้ด JavaScript ด้านล่างสุดของ body -->
+    <script>
+        // รอให้โหลด DOM เสร็จก่อน
+        document.addEventListener('DOMContentLoaded', () => {
+            // หา element ทั้งหมดที่มี class add-cart
+            const addCartButtons = document.querySelectorAll('.add-cart');
+    
+            addCartButtons.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const productId = btn.getAttribute('data-id');
+                    if (!productId) return;
+    
+                    // เตรียมข้อมูลที่จะส่ง ไปให้ backend
+                    const payload = {
+                        productId: parseInt(productId),
+                        quantity: 1
+                    };
+    
+                    // ส่ง POST request ด้วย fetch
+                    fetch('/api/cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // แสดงข้อความแจ้งเตือนว่าสำเร็จ
+                            // คุณอาจจะแสดง Toast หรือ Alert แบบนี้ได้
+                            alert('✅ เพิ่มสินค้าลงตะกร้าสำเร็จ');
+                        } else {
+                            alert('❌ เกิดข้อผิดพลาด: ' + (data.error || 'Unknown'));
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ');
+                    });
+                });
+            });
+        });
+        </script>
+    </body>
+    
+
 </body>
 
 </html>
