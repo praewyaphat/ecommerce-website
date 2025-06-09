@@ -1,3 +1,5 @@
+
+// Server.js
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -12,10 +14,12 @@ app.use(bodyParser.json());
 // Static Files
 app.use(express.static(path.join(__dirname, '../')));
 
-// Routes
+
 app.use('/api/products', require('./routes/products'));
-app.use('/api/search', require('./routes/search'));
+app.use('/api/search',   require('./routes/search'));
++app.use('/api/cart',     require('./routes/cart'));
+
 
 app.listen(PORT, () => {
-    console.log("✅ Server is running at http://localhost:"+PORT);
-})
+    console.log("✅ Server is running at http://localhost:" + PORT);
+});
