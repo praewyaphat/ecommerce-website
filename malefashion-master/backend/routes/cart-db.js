@@ -1,18 +1,21 @@
-// cart-db.js
-const Database = require('better-sqlite3');
+const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const db = new sqlite3.Database(path.join(__dirname, '../../products.db'), err => {
+  if (err) return console.error(err);
+  console.log('🔗 DB เปิดสำเร็จ');
+});
 
-const db = new Database(path.join(__dirname, '../products.db'));
-
-// สร้างตาราง cart ถ้ายังไม่มี
-db.exec(`
+// สร้างตาราง cart
+db.run(`
   CREATE TABLE IF NOT EXISTS cart (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     product_id INTEGER NOT NULL,
     quantity INTEGER NOT NULL DEFAULT 1,
     added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (product_id) REFERENCES products(id)
-  );
-`);
-
-console.log('✅ ตรวจสอบ/สร้างตาราง cart สำเร็จ');
+    FOREIGN KEY(product_id) REFERENCES products(id)
+  )
+`, err => {
+  if (err) console.error(err);
+  else      console.log('✅ สร้าง/ตรวจสอบตาราง cart เรียบร้อย');
+  db.close();
+});

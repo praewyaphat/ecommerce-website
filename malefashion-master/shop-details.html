@@ -644,6 +644,29 @@
     <script src="js/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
 
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          document.querySelectorAll('.add-cart').forEach(btn => {
+            btn.addEventListener('click', e => {
+              e.preventDefault();
+              const productId = btn.dataset.id;
+              fetch('/api/cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: +productId, quantity: 1 })
+              })
+              .then(r => r.json())
+              .then(res => {
+                if (res.success) alert('✅ เพิ่มสินค้าลงตะกร้าแล้ว');
+                else          alert('❌ ' + (res.error||'fail'));
+              })
+              .catch(() => alert('❌ ไม่สามารถเชื่อมต่อ API ได้'));
+            });
+          });
+        });
+        </script>
+        
     
 </body>
 

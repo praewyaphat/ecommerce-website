@@ -371,6 +371,38 @@
     <script src="js/mixitup.min.js"></script>
     <script src="js/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
+
+    <tbody id="cart-body"></tbody>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const tbody = document.getElementById('cart-body');
+  function loadCart() {
+    fetch('/api/cart')
+      .then(r => r.json())
+      .then(items => {
+        tbody.innerHTML = items.map(i => `
+          <tr>
+            <td>${i.name}</td>
+            <td>${i.quantity}</td>
+            <td>$${i.total_price.toFixed(2)}</td>
+            <td><button data-id="${i.id}" class="remove-btn">x</button></td>
+          </tr>
+        `).join('');
+        // ผูก event ลบ
+        tbody.querySelectorAll('.remove-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            fetch('/api/cart/'+btn.dataset.id, { method: 'DELETE' })
+              .then(r => r.json())
+              .then(loadCart);
+          });
+        });
+      });
+  }
+  loadCart();
+});
+</script>
+
 </body>
 
 </html>
