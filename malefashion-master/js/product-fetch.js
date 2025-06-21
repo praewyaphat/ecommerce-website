@@ -30,6 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
               </ul>
             </div>
             <div class="product__item__text">
+            <a href="#" class="add-cart" data-id="${p.id}">+ Add To Cart</a>
               <h6>${p.name}</h6>
               <h5>฿${p.price}</h5>
             </div>
