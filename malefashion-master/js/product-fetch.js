@@ -115,7 +115,9 @@ function renderShop() {
         </div>
         <div class="product__item__text">
           <h6>${p.name}</h6>
-          <a href="#" class="add-cart" data-id="${p.id}">+ Add To Cart</a>
+          // <a href="#" class="add-cart" data-id="${p.id}">+ Add To Cart</a>
+                                      <a href="#" class="add-cart" data-id="4">+ Add To Cart</a>
+
           <div class="rating">
             <i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
             <i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
