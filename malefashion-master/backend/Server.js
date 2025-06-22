@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, '../')));
 
 app.use('/api/products', require('./routes/products'));
 app.use('/api/search',   require('./routes/search'));
-+app.use('/api/cart',     require('./routes/cart'));
+app.use('/api/cart',     require('./routes/cart'));
 
 
 app.listen(PORT, () => {
