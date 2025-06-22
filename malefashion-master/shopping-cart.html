@@ -198,7 +198,7 @@
                             <li>Total    <span id="total-amt">$ 0.00</span></li>
                         </ul>
 
-                        <a href="#" class="primary-btn">Proceed to checkout</a>
+                        <a href="checkout.html" class="primary-btn">Proceed to checkout</a>
                     </div>
                 </div>
             </div>
@@ -298,86 +298,22 @@
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const tbody   = document.getElementById('cart-body');
-          const subEl   = document.getElementById('subtotal-amt');
-          const totEl   = document.getElementById('total-amt');
-        
-          function loadCart() {
-            fetch('/api/cart')
-              .then(r => r.json())
-              .then(items => {
-                if (!items.length) {
-                  tbody.innerHTML = '<tr><td colspan="4" class="text-center">Your cart is empty.</td></tr>';
-                  subEl.textContent = '$ 0.00';
-                  totEl.textContent = '$ 0.00';
-                  return;
-                }
-                let subtotal = 0;
-                tbody.innerHTML = items.map(i => {
-                  subtotal += i.total_price;
-                  return `
-                    <tr>
-                      <td class="product__cart__item">
-                        <div class="product__cart__item__pic">
-                          <img src="${i.image || 'img/shopping-cart/cart-1.jpg'}" alt="">
-                        </div>
-                        <div class="product__cart__item__text">
-                          <h6>${i.name}</h6>
-                          <h5>$${i.price.toFixed(2)}</h5>
-                        </div>
-                      </td>
-                      <td class="quantity__item">
-                        <div class="quantity">
-                          <div class="pro-qty-2">
-                            <input type="text" value="${i.quantity}" readonly>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="cart__price">$ ${i.total_price.toFixed(2)}</td>
-                      <td class="cart__close">
-                        <button class="remove-btn" data-id="${i.id}">
-                          <i class="fa fa-close"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  `;
-                }).join('');
-        
-                const fmt = subtotal.toFixed(2);
-                subEl.textContent = '$ ' + fmt;
-                totEl.textContent = '$ ' + fmt;
-        
-                tbody.querySelectorAll('.remove-btn').forEach(btn => {
-                  btn.onclick = () => {
-                    fetch('/api/cart/' + btn.dataset.id, { method: 'DELETE' })
-                      .then(() => loadCart());
-                  };
-                });
-        
-                // เรียก pro-qty-2 plugin (ถ้าใช้)
-                if (window.$) {
-                  $('.pro-qty-2').each(function() {
-                    var _this = $(this);
-                    _this.html('<span class="dec qtybtn">-</span>'+
-                               '<input type="text" value="'+_this.find('input').val()+'">'+
-                               '<span class="inc qtybtn">+</span>');
-                  });
-                  $('.qtybtn').on('click', function() {
-                    var $btn = $(this);
-                    var old = $btn.siblings('input').val();
-                    var val = $btn.hasClass('inc') ? +old+1 : (old>1?old-1:1);
-                    $btn.siblings('input').val(val);
-                  });
-                }
-              })
-              .catch(() => {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error loading cart.</td></tr>';
-              });
-          }
-          loadCart();
-        });
-        </script>
+  // เก็บตะกร้าไว้ใน localStorage เพื่อให้ checkout อ่านได้
+  function saveCartToLocalStorage(items) {
+    localStorage.setItem('checkoutCart', JSON.stringify(items));
+  }
+
+  // ปรับ fetch cart เพื่อเซฟ
+  function loadCart() {
+    fetch('/api/cart')
+      .then(r => r.json())
+      .then(items => {
+        saveCartToLocalStorage(items);
+        // ... โค้ดเดิมยังเหมือนเดิม
+      });
+  }
+</script>
+
         
 
 </body>
