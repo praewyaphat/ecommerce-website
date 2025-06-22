@@ -312,6 +312,60 @@
         // ... โค้ดเดิมยังเหมือนเดิม
       });
   }
+
+  document.addEventListener("DOMContentLoaded", () => {
+  fetch("/api/cart")
+    .then(res => res.json())
+    .then(items => {
+      const tbody = document.getElementById("cart-body");
+      const subtotalEl = document.getElementById("subtotal-amt");
+      const totalEl = document.getElementById("total-amt");
+
+      let total = 0;
+      tbody.innerHTML = "";
+
+      if (!Array.isArray(items) || items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center">ไม่มีสินค้าในตะกร้า</td></tr>`;
+        subtotalEl.textContent = "$0.00";
+        totalEl.textContent = "$0.00";
+        return;
+      }
+
+      items.forEach(item => {
+        const totalPerItem = item.price * item.quantity;
+        total += totalPerItem;
+
+        tbody.insertAdjacentHTML("beforeend", `
+          <tr>
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>$${totalPerItem.toFixed(2)}</td>
+            <td><button onclick="removeItem(${item.id})" class="btn btn-sm btn-danger">ลบ</button></td>
+          </tr>
+        `);
+      });
+
+      subtotalEl.textContent = `$${total.toFixed(2)}`;
+      totalEl.textContent = `$${total.toFixed(2)}`;
+    });
+});
+
+// ✅ ฟังก์ชันลบสินค้า
+function removeItem(id) {
+  fetch(`/api/cart/${id}`, { method: "DELETE" })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        location.reload(); // โหลดใหม่ให้ข้อมูลอัปเดต
+      } else {
+        alert("❌ ลบสินค้าไม่สำเร็จ");
+      }
+    })
+    .catch(err => {
+      console.error("❌ error:", err);
+      alert("❌ เกิดข้อผิดพลาด");
+    });
+}
 </script>
 
         
