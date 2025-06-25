@@ -19,6 +19,8 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/search',   require('./routes/search'));
 app.use('/api/cart',     require('./routes/cart'));
 app.use('/api/admin/products', require('./routes/admin'));
+app.use('/api/register', require('./routes/register'));
+app.use('/api/login', require('./routes/login'));
 
 
 
