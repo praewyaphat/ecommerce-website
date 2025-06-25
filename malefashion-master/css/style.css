@@ -3870,3 +3870,18 @@ ol {
 		height: 250px;
 	}
 }
+
+.checkout__total__products li {
+  display: flex;
+  justify-content: space-between; /* จัดเรียงให้ชิดซ้ายขวา */
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.checkout__total__products .product-name {
+  text-align: left;
+}
+
+.checkout__total__products .product-price {
+  text-align: right;
+}
