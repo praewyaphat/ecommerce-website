@@ -333,6 +333,10 @@
             const phone = document.getElementById('phone').value;
             const email = document.getElementById('email').value;
 
+            if (!firstName || !lastName || !address || !phone || !email) {
+                alert('กรุณากรอกข้อมูลให้ครบทุกช่องที่จำเป็น');
+                return;
+            }
             // ข้อมูลสินค้าในตะกร้า
             const items = JSON.parse(localStorage.getItem('checkoutCart')) || [];
 
@@ -358,6 +362,8 @@
             .then(data => {
                 console.log('Data saved successfully:', data);
                 alert('ข้อมูลการชำระเงินถูกบันทึกแล้ว!');
+
+                localStorage.setItem('billingData', JSON.stringify(billingData));
 
                 // หลังจากบันทึกข้อมูลเสร็จ สามารถไปหน้าใหม่ได้
                 window.location.href = '/thankyou.html'; // เปลี่ยน URL เป็นหน้า Thank You Page ที่คุณจะสร้างต่อไป
