@@ -3,9 +3,16 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
+const session = require('express-session'); 
 
 const app = express();
 const PORT = 3000;
+
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: true,
+}));
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -35,8 +42,12 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/search',   require('./routes/search'));
 app.use('/api/cart',     require('./routes/cart'));
 app.use('/api/admin/products', require('./routes/admin'));
-app.use('/api/register', require('./routes/register'));
 app.use('/api/login', require('./routes/login'));
+console.log('Route /api/login loaded successfully');
+
+app.use('/api/register', require('./routes/register'));
+console.log('Route /api/register loaded successfully'); // แสดงข้อความเมื่อเส้นทางถูกโหลด
+
 
 // เริ่มเซิร์ฟเวอร์
 app.listen(PORT, () => {

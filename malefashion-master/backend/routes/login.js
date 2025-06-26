@@ -1,6 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
+
 const fs = require('fs');
 const path = require('path');
 
@@ -23,6 +24,7 @@ router.post('/',(req,res) => {
   if (user.password !== password) {
     return res.send("Incorrected Password.");
   }
+  req.session.user = user;
 
   res.send("Login successfully.");
 });

@@ -35,7 +35,7 @@
     <div class="offcanvas-menu-wrapper">
         <div class="offcanvas__option">
             <div class="offcanvas__links">
-                <a href="#" data-toggle="modal" data-target="#signUpModal">Sign in</a>
+                <a href="#" data-toggle="modal" data-target="#loginModal">Sign in</a>
                 <a href="#">FAQs</a>
             </div>
             <div class="offcanvas__top__hover">
@@ -73,7 +73,7 @@
                     <div class="col-lg-6 col-md-5">
                         <div class="header__top__right">
                             <div class="header__top__links">
-                                <a href="#" data-toggle="modal" data-target="#signUpModal">Sign in</a>
+                                <a href="#" data-toggle="modal" data-target="#loginModal">Sign in</a>
                                 <a href="#">FAQs</a>
                             </div>
                             <div class="header__top__hover">
@@ -126,6 +126,31 @@
             </div>
             <div class="canvas__open"><i class="fa fa-bars"></i></div>
         </div>
+
+<!-- Modal Login -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loginModalLabel">Login</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Login Form -->
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="Enter your email" />
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Enter your password" />
+                </div>
+                <button type="button" onclick="loginSubmit()" class="btn btn-primary btn-block">Login</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Sign Up Modal -->
 <div class="modal fade" id="signUpModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
@@ -537,45 +562,45 @@
             });
         });
 
-         async function registerSubmit() {
-    const user = {
-        firstName: document.getElementById("reg-fname").value,
-        lastName: document.getElementById("reg-lname").value,
-        email: document.getElementById("reg-email").value,
-        password: document.getElementById("reg-password").value
-    };
-    console.log(user);
+        async function registerSubmit() {
+            const user = {
+            firstName: document.getElementById("reg-fname").value,
+            lastName: document.getElementById("reg-lname").value,
+            email: document.getElementById("reg-email").value,
+            password: document.getElementById("reg-password").value
+        };
+        console.log(user);
 
-    if (!user.firstName.trim() || !user.lastName.trim() || !user.email.trim() || !user.password.trim()) {
-        return alert("Please fill in all fields");
-    }
-
-    try {
-        const response = await fetch('http://localhost:3000/api/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(user)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.message || "Register successfully.");
-        } else {
-            alert(result.error || "Error registering user");
+        if (!user.firstName.trim() || !user.lastName.trim() || !user.email.trim() || !user.password.trim()) {
+            return alert("Please fill in all fields");
         }
-    } catch (error) {
-        console.error(error);
-        alert("Error registering user");
+
+        try {
+            const response = await fetch('http://localhost:3000/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message || "Register successfully.");
+                $('#signUpModal').modal('hide'); 
+            } else {
+                alert(result.error || "Error registering user");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error registering user");
+        }
     }
-}
 
-
-      async function loginSubmit() {
+    async function loginSubmit() {
         const loginData = {
-          username: document.getElementById("login-username").value.trim(),
+          username: document.getElementById("login-email").value.trim(),
           password: document.getElementById("login-password").value.trim()
         }
         console.log(loginData);
@@ -592,6 +617,12 @@
 
           const result = await response.text();
           alert(result);
+           if (result === "Login successfully.") {
+            window.location.href = "/shop.html";
+        } else {
+            alert(result);
+        }
+
         } catch (error) {
           console.error(error);
           alert("An error occurred while logging in");
