@@ -350,12 +350,15 @@
 
 // ✅ ฟังก์ชันลบสินค้า
 function removeItem(id) {
+    console.log("Item ID to Delete: "+ id);
+
   fetch(`/api/cart/${id}`, { method: "DELETE" })
     .then(res => res.json())
     .then(data => {
       if (data.success) {
         location.reload(); // โหลดใหม่ให้ข้อมูลอัปเดต
       } else {
+        console.error("Error:", data.error);
         alert("❌ ลบสินค้าไม่สำเร็จ: " + (data.error || 'Unknown error'));
       }
     })

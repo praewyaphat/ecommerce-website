@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
 
       if (cartItem) {
         // ถ้ามีสินค้าอยู่แล้ว, update quantity
-        const newQuantity = cartItem.quantity + (quantity || 1);
+        const newQuantity = cartItem.quantity + quantity;
         db.run(
           'UPDATE cart SET quantity = ? WHERE id = ?',
           [newQuantity, cartItem.id],
@@ -40,7 +40,7 @@ router.post('/', (req, res) => {
         // ถ้าไม่มี, insert สินค้าใหม่
         db.run(
           'INSERT INTO cart (product_id, quantity) VALUES (?, ?)',
-          [productId, quantity || 1],
+          [productId, quantity],
           function(e) {
             if (e) return res.status(500).json({ error: e.message });
             res.json({ success: true, cartId: this.lastID });
@@ -69,14 +69,23 @@ router.get('/', (_req, res) => {
 
 // ลบรายการ
 router.delete('/:id', (req, res) => {
-  db.run('DELETE FROM cart WHERE id = ?', [req.params.id], function(err) {
-    if (err) return res.status(500).json({ error: err.message });
-    
-    if (this.changes === 0) { // ถ้าไม่พบข้อมูล
-      return res.status(404).json({ error: 'Item not found' });
-    }
-    res.json({ success: true, deleted: this.changes });
-  });
+    const productId = req.params.id;
+
+    console.log("Received product ID to delete:", productId);
+
+    const query = 'DELETE FROM cart WHERE product_id = ?';
+
+    db.run(query, [productId], function(err) {
+        if (err) {
+            return res.status(500).json({ success: false, error: err.message });
+        }
+
+        if (this.changes === 0) {
+            return res.status(404).json({ success: false, error: "Item not found" });
+        }
+
+        res.json({ success: true });
+    });
 });
 
 module.exports = router;
