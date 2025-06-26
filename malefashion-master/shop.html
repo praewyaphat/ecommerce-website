@@ -145,6 +145,7 @@
                     <label for="login-password">Password</label>
                     <input type="password" id="login-password" class="form-control" placeholder="Enter your password" />
                 </div>
+                <p>Don't have an account? <a href="#" id="open-register-modal">Sign up here</a></p>
                 <button type="button" onclick="loginSubmit()" class="btn btn-primary btn-block">Login</button>
             </div>
         </div>
@@ -560,6 +561,14 @@
                         });
                 });
             });
+        });
+
+        document.getElementById("open-register-modal").addEventListener("click", function(e) {
+            e.preventDefault();
+
+            $('#loginModal').modal('hide');
+
+            $('#signUpModal').modal('show');
         });
 
         async function registerSubmit() {

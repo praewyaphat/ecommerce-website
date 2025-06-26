@@ -10,5 +10,11 @@
     "lastName": "maiarrin",
     "email": "pz@gmail.com",
     "password": "p"
+  },
+  {
+    "firstName": "book",
+    "lastName": "big",
+    "email": "bb@gmail.com",
+    "password": "bb"
   }
 ]
