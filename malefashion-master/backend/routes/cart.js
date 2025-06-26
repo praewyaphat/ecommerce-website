@@ -7,47 +7,35 @@ const db = new sqlite3.Database(path.join(__dirname, '../../products.db'), (err)
   if (err) console.error('Error opening database: ', err.message);
 });
 
-// เพิ่มสินค้า
+// เพิ่มสินค้าลงตะกร้า
 router.post('/', (req, res) => {
   const { productId, quantity } = req.body;
+
   if (!productId) return res.status(400).json({ error: 'Missing productId' });
 
-  // ตรวจสอบค่า quantity ว่ามีค่าเป็นตัวเลขที่ถูกต้องหรือไม่
-  if (isNaN(quantity) || quantity <= 0) {
-    return res.status(400).json({ error: 'Invalid quantity' });
-  }
-
-  db.get('SELECT id FROM products WHERE id = ?', [productId], (err, row) => {
+  db.get('SELECT id FROM cart WHERE product_id = ?', [productId], (err, cartItem) => {
     if (err) return res.status(500).json({ error: err.message });
-    if (!row) return res.status(404).json({ error: 'Product not found' });
 
-    // เช็คว่ามีสินค้านี้ในตะกร้าหรือไม่
-    db.get('SELECT id, quantity FROM cart WHERE product_id = ?', [productId], (err, cartItem) => {
-      if (err) return res.status(500).json({ error: err.message });
-
-      if (cartItem) {
-        // ถ้ามีสินค้าอยู่แล้ว, update quantity
-        const newQuantity = cartItem.quantity + quantity;
-        db.run(
-          'UPDATE cart SET quantity = ? WHERE id = ?',
-          [newQuantity, cartItem.id],
-          function(e) {
-            if (e) return res.status(500).json({ error: e.message });
-            res.json({ success: true, updated: true });
-          }
-        );
-      } else {
-        // ถ้าไม่มี, insert สินค้าใหม่
-        db.run(
-          'INSERT INTO cart (product_id, quantity) VALUES (?, ?)',
-          [productId, quantity],
-          function(e) {
-            if (e) return res.status(500).json({ error: e.message });
-            res.json({ success: true, cartId: this.lastID });
-          }
-        );
-      }
-    });
+    if (cartItem) {
+      const newQuantity = cartItem.quantity + quantity;
+      db.run(
+        'UPDATE cart SET quantity = ? WHERE id = ?',
+        [newQuantity, cartItem.id],
+        function(e) {
+          if (e) return res.status(500).json({ error: e.message });
+          res.json({ success: true, updated: true });
+        }
+      );
+    } else {
+      db.run(
+        'INSERT INTO cart (product_id, quantity) VALUES (?, ?)',
+        [productId, quantity],
+        function(e) {
+          if (e) return res.status(500).json({ error: e.message });
+          res.json({ success: true, cartId: this.lastID });
+        }
+      );
+    }
   });
 });
 
@@ -65,6 +53,25 @@ router.get('/', (_req, res) => {
     res.json(rows);
   });
 });
+
+// อัปเดตจำนวนสินค้าตาม product_id
+router.put('/:productId', (req, res) => {
+    const productId = req.params.productId;
+    const { quantity } = req.body;
+
+    if (isNaN(quantity) || quantity < 1) {
+        return res.status(400).json({ error: 'Invalid quantity' });
+    }
+
+    const query = 'UPDATE cart SET quantity = ? WHERE product_id = ?';
+    db.run(query, [quantity, productId], function(err) {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json({ success: true, updated: true });
+    });
+});
+
 
 
 // ลบรายการ

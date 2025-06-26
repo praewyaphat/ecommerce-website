@@ -34,22 +34,13 @@
     <div class="offcanvas-menu-wrapper">
         <div class="offcanvas__option">
             <div class="offcanvas__links">
-                <a href="#">Sign in</a>
-                <a href="#">FAQs</a>
-            </div>
-            <div class="offcanvas__top__hover">
-                <span>Usd <i class="arrow_carrot-down"></i></span>
-                <ul>
-                    <li>USD</li>
-                    <li>EUR</li>
-                    <li>USD</li>
-                </ul>
+                <a href="#" id="sign" data-toggle="modal" data-target="#loginModal">Sign In</a>
             </div>
         </div>
         <div class="offcanvas__nav__option">
             <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
             <a href="#"><img src="img/icon/heart.png" alt=""></a>
-            <a href="#"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
+            <a href="shopping-cart.html"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
             <div class="price">$0.00</div>
         </div>
         <div id="mobile-menu-wrap"></div>
@@ -67,22 +58,6 @@
                     <div class="col-lg-6 col-md-7">
                         <div class="header__top__left">
                             <p>Free shipping, 30-day return or refund guarantee.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-5">
-                        <div class="header__top__right">
-                            <div class="header__top__links">
-                                <a href="#">Sign in</a>
-                                <a href="#">FAQs</a>
-                            </div>
-                            <div class="header__top__hover">
-                                <span>Usd <i class="arrow_carrot-down"></i></span>
-                                <ul>
-                                    <li>USD</li>
-                                    <li>EUR</li>
-                                    <li>USD</li>
-                                </ul>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -306,7 +281,6 @@
       .then(r => r.json())
       .then(items => {
         saveCartToLocalStorage(items);
-        // ... โค้ดเดิมยังเหมือนเดิม
       });
   }
 
@@ -333,17 +307,35 @@
         total += totalPerItem;
 
         tbody.insertAdjacentHTML("beforeend", `
-          <tr>
-            <td>${item.name}</td>
-            <td>${item.quantity}</td>
-            <td>$${totalPerItem.toFixed(2)}</td>
-            <td><button onclick="removeItem(${item.product_id})" class="btn btn-sm btn-danger">ลบ</button></td>
-          </tr>
-        `);
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>
+                            <input type="number" value="${item.quantity}" min="1" class="quantity-input" data-id="${item.product_id}">
+                        </td>
+                        <td>$${totalPerItem.toFixed(2)}</td>
+                        <td><button onclick="removeItem(${item.product_id})" class="btn btn-sm btn-danger">ลบ</button></td>
+                    </tr>
+                `);
       });
 
       subtotalEl.textContent = `$${total.toFixed(2)}`;
       totalEl.textContent = `$${total.toFixed(2)}`;
+
+      document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    const newQuantity = e.target.value;
+                    const productId = e.target.getAttribute('data-id');  // รับ ID ของสินค้าจาก data-id
+
+                    // เช็คว่าจำนวนสินค้าไม่ต่ำกว่า 1
+                    if (newQuantity < 1) {
+                        alert("Quantity must be at least 1");
+                        return;
+                    }
+
+                    // ส่ง request ไปที่ backend เพื่ออัปเดตจำนวนสินค้า
+                    updateQuantity(productId, newQuantity);
+                });
+            });
     });
 });
 
@@ -388,7 +380,29 @@ document.querySelector(".primary-btn").addEventListener("click", () => {
     });
 });
 
-
+// ฟังก์ชันอัปเดตจำนวนสินค้าในตะกร้า
+function updateQuantity(productId, newQuantity) {
+    fetch(`/api/cart/${productId}`, {
+        method: "PUT",  // ใช้ PUT สำหรับการอัปเดต
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ quantity: newQuantity })  // ส่งข้อมูล quantity ที่อัปเดต
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Quantity updated successfully');
+            location.reload(); // โหลดใหม่เพื่ออัปเดตข้อมูลใน UI
+        } else {
+            alert('Failed to update quantity');
+        }
+    })
+    .catch(err => {
+        console.error('Error:', err);
+        alert('Error while updating quantity');
+    });
+}
 </script>
 
 </body>
