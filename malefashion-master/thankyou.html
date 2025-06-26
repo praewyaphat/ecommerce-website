@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zxx">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Male_Fashion Template">
+    <meta name="keywords" content="Male_Fashion, unica, creative, html">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Thank You | Male Fashion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .back-to-shop {
+            font-size: 1em;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #444;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .thank-you-container {
+            width: 80%;
+            margin: 0 auto;
+            margin-top: 100px;
+        }
+
+        .thank-you-header h1 {
+            font-size: 2em;
+            font-family: 'Great Vibes', cursive;
+            text-align: center;
+        }
+
+        .order-summary {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .thank-you-message {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .thank-you-message h2 {
+            font-family: 'Great Vibes', cursive;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Shop Button -->
+    <a href="shop.html" class="back-to-shop" id="back-to-shop">Back to Shop</a>
+
+    <div class="thank-you-container">
+        <div class="thank-you-header">
+            <h1>Thank You for Your Order!</h1>
+        </div>
+
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            <div id="billing-details"></div>
+            <div id="order-items"></div>
+            <h4 id="total-price"></h4>
+        </div>
+
+        <div class="thank-you-message">
+            <h2>Thank You for Shopping with Us!</h2>
+            <p>We appreciate your business and will process your order soon.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // เมื่อคลิกปุ่ม Back to Shop
+            const backToShopButton = document.getElementById('back-to-shop');
+            
+            if (backToShopButton) {  // ตรวจสอบว่า element มีอยู่
+                backToShopButton.addEventListener('click', () => {
+                    // ลบข้อมูลจาก localStorage
+                    localStorage.removeItem('checkoutCart'); // ลบข้อมูลตะกร้า
+                    console.log('Cart has been cleared!');
+                });
+            } else {
+                console.log("Back to Shop button not found.");
+            }
+
+            // ดึงข้อมูลจาก billing_details.json
+    fetch('/data/billing_details.json')
+        .then(response => response.json())
+        .then(data => {
+            if (data) {
+                const billingDetails = document.getElementById('billing-details');
+                const orderItems = document.getElementById('order-items');
+                const totalPrice = document.getElementById('total-price');
+
+                // แสดงข้อมูลที่อยู่
+                billingDetails.innerHTML = `
+                    <p><strong>First Name:</strong> ${data.firstName}</p>
+                    <p><strong>Last Name:</strong> ${data.lastName}</p>
+                    <p><strong>Address:</strong> ${data.address}</p>
+                    <p><strong>Apartment:</strong> ${data.apartment}</p>
+                    <p><strong>Phone:</strong> ${data.phone}</p>
+                    <p><strong>Email:</strong> ${data.email}</p>
+                `;
+
+                // แสดงข้อมูลสินค้าที่ซื้อ
+                let itemsHtml = '<h4>Items Purchased</h4><ul>';
+                let total = 0;
+                data.items.forEach(item => {
+                    itemsHtml += `<li>${item.name} - ฿ ${item.price.toFixed(2)} x ${item.quantity} = ฿ ${item.total_price.toFixed(2)}</li>`;
+                    total += item.total_price;
+                });
+                itemsHtml += '</ul>';
+                orderItems.innerHTML = itemsHtml;
+
+                // แสดงยอดรวม
+                totalPrice.innerHTML = `Total: ฿ ${total.toFixed(2)}`;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading billing details:', error);
+        });
+        });
+    </script>
+</body>
+</html>

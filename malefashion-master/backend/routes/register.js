@@ -1,37 +1,45 @@
 
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
 const path = require('path');
 
-router.post('/',(req,res) => {
+const db = new sqlite3.Database(path.join(__dirname, '..','data', 'database.db'));
+
+db.serialize(() => {
+    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, password TEXT)");
+});
+
+router.post('/', (req, res) => {
     const newUser = req.body;
 
-    const filePath = path.join(__dirname,'..','data','user.json');
+    const { email, password } = newUser;
 
-    let user = [];
-    if(fs.existsSync(filePath)){
-         //file is there
-        const filedata = fs.readFileSync(filePath, 'utf-8');
-        user =JSON.parse(filedata);
+    db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
+        if (err) {
+            return res.status(500).send("Error checking user data");
+        }
 
-        if (user.find(user => user.email === newUser.email)) {
+        if (row) {
             return res.send('This email has already been used.');
         }
 
-        user.push(newUser);
-        fs.writeFileSync(filePath, JSON.stringify(user, null, 2));
-        res.status(200).json({status : "Register successfully!"});
-        console.log('New user registered', newUser.email);
-    }else{
-        //no file
-        user.push(newUser);
-        fs.writeFileSync(filePath, JSON.stringify(user, null, 2));
-        res.status(200).json({status : "Register successfully!"});
-        console.log('New user registered', newUser.email);
-    }
+        const hashedPassword = bcrypt.hashSync(password, 10);
 
+        const stmt = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)');
+        stmt.run(email, hashedPassword, function (err) {
+            if (err) {
+                return res.status(500).send("Error registering user");
+            }
 
+            req.session.user = { id: this.lastID, email };
+
+            res.status(200).json({ status: "Register successfully!" });
+            console.log('New user registered', email);
+        });
+        stmt.finalize();
+    });
 });
 
 module.exports = router;

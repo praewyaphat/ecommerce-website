@@ -1,32 +1,37 @@
-
 const express = require('express');
 const router = express.Router();
-
-const fs = require('fs');
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');  // ใช้ bcrypt สำหรับการเข้ารหัสรหัสผ่าน
 const path = require('path');
 
-router.post('/',(req,res) => {
-    const { username, password} = req.body;
+const db = new sqlite3.Database(path.join(__dirname, '..','data', 'database.db'));
 
-    const filePath = path.join(__dirname,'..','data','user.json');
+router.post('/', (req, res) => {
+    const { username, password } = req.body;
 
-     if (!fs.existsSync(filePath)) {
-    return res.send("์No user information yet");
-  }
+    db.get('SELECT * FROM users WHERE email = ?', [username], (err, row) => {
+        if (err) {
+            return res.status(500).send("Error checking user data");
+        }
 
-  const users = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  const user = users.find(u => u.email === username);
+        if (!row) {
+            return res.send("Incorrected Username");
+        }
 
-  if (!user) {
-    return res.send("Incorrected Username");
-  }
+        bcrypt.compare(password, row.password, (err, isMatch) => {
+            if (err) {
+                return res.status(500).send("Error comparing password");
+            }
 
-  if (user.password !== password) {
-    return res.send("Incorrected Password.");
-  }
-  req.session.user = user;
+            if (!isMatch) {
+                return res.send("Incorrected Password.");
+            }
 
-  res.send("Login successfully.");
+            req.session.user = row;
+
+            res.send("Login successfully.");
+        });
+    });
 });
 
 module.exports = router;

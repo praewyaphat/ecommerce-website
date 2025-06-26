@@ -118,8 +118,8 @@
                     <div class="header__nav__option">
                         <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
                         <a href="#"><img src="img/icon/heart.png" alt=""></a>
-                        <a href="#"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
-                        <div class="price">$0.00</div>
+                        <a href="shopping-cart.html"><img src="img/icon/cart.png" alt=""> <span></span></a>
+                        <!-- <div class="price">$0.00</div> -->
                     </div>
                 </div>
             </div>
@@ -191,7 +191,6 @@
                                   </div>
                                 </div>
                               </div>
-                              <button type="submit" class="site-btn">Place Order</button>
                             </form>
                         </div>
                         <div class="col-lg-4 col-md-6">
@@ -216,7 +215,8 @@
                                         <span class="checkmark"></span>
                                     </label>
                                 </div>
-                                <button type="submit" class="site-btn">PLACE ORDER</button>
+                                <button type="submit" id="place-order-btn" class="site-btn">Place Order</button>
+
                             </div>
                         </div>
                     </div>
@@ -348,48 +348,56 @@
 
     <script>
  document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('billing-form');
-  
-  if (form) {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault(); // หยุดการส่งฟอร์ม
+    const placeOrderBtn = document.getElementById('place-order-btn');
 
-      // ดึงค่าจาก input fields
-      const firstName = document.getElementById('first-name').value;
-      const lastName = document.getElementById('last-name').value;
-      const address = document.getElementById('address').value;
-      const apartment = document.getElementById('apartment').value;
-      const phone = document.getElementById('phone').value;
-      const email = document.getElementById('email').value;
+    if (placeOrderBtn) {
+        placeOrderBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // หยุดการส่งฟอร์ม
+            console.log("Place Order clicked!");
 
-      const billingData = {
-        firstName,
-        lastName,
-        address,
-        apartment,
-        phone,
-        email
-      };
+            // ดึงค่าจาก input fields
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const address = document.getElementById('address').value;
+            const apartment = document.getElementById('apartment').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
 
-      // ส่งข้อมูลไปที่ backend เพื่อบันทึกในไฟล์ JSON
-      fetch('/api/save-billing', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(billingData)
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log('Data saved successfully:', data);
-        alert('ข้อมูลการชำระเงินถูกบันทึกแล้ว!');
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-      });
-    });
-  }
+            // ข้อมูลสินค้าในตะกร้า
+            const items = JSON.parse(localStorage.getItem('checkoutCart')) || [];
+
+            const billingData = {
+                firstName,
+                lastName,
+                address,
+                apartment,
+                phone,
+                email,
+                items // รวมข้อมูลสินค้าจากตะกร้า
+            };
+
+            // ส่งข้อมูลไปที่ backend เพื่อบันทึกในไฟล์ JSON
+            fetch('/api/save-billing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(billingData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Data saved successfully:', data);
+                alert('ข้อมูลการชำระเงินถูกบันทึกแล้ว!');
+
+                // หลังจากบันทึกข้อมูลเสร็จ สามารถไปหน้าใหม่ได้
+                window.location.href = '/thankyou.html'; // เปลี่ยน URL เป็นหน้า Thank You Page ที่คุณจะสร้างต่อไป
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+            });
+        });
+    }
 });
 
 </script>

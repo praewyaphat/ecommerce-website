@@ -1,0 +1,32 @@
+{
+  "firstName": "Yanaphat",
+  "lastName": "Inkham",
+  "address": "132/2 chaingmai university ",
+  "apartment": "Chaingmai University",
+  "phone": "0903174670",
+  "email": "deeiicamt6@gmail.com",
+  "items": [
+    {
+      "product_id": 4,
+      "name": "Jeans",
+      "price": 98.49,
+      "quantity": 2,
+      "total_price": 196.98
+    },
+    {
+      "product_id": 3,
+      "name": "Shirt hood",
+      "price": 60.9,
+      "quantity": 2,
+      "total_price": 121.8
+    },
+    {
+      "product_id": 1,
+      "name": "Blown Jacket",
+      "price": 67.24,
+      "quantity": 2,
+      "total_price": 134.48
+    }
+  ],
+  "total": 453.26
+}

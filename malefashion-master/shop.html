@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="zxx">
-
 <head>
     <meta charset="UTF-8">
     <meta name="description" content="Male_Fashion Template">
@@ -10,8 +9,7 @@
     <title>Male-Fashion | Template</title>
 
     <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
@@ -35,7 +33,7 @@
     <div class="offcanvas-menu-wrapper">
         <div class="offcanvas__option">
             <div class="offcanvas__links">
-                <a href="#" data-toggle="modal" data-target="#loginModal">Sign in</a>
+                <a href="#" id="sign" data-toggle="modal" data-target="#loginModal">Sign In</a>
                 <a href="#">FAQs</a>
             </div>
             <div class="offcanvas__top__hover">
@@ -73,7 +71,7 @@
                     <div class="col-lg-6 col-md-5">
                         <div class="header__top__right">
                             <div class="header__top__links">
-                                <a href="#" data-toggle="modal" data-target="#loginModal">Sign in</a>
+                                <a href="#" id="authButton" data-toggle="modal" data-target="#loginModal">Sign In</a>
                                 <a href="#">FAQs</a>
                             </div>
                             <div class="header__top__hover">
@@ -119,8 +117,8 @@
                     <div class="header__nav__option">
                         <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
                         <a href="#"><img src="img/icon/heart.png" alt=""></a>
-                        <a href="shopping-cart.html"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
-                        <div class="price">$0.00</div>
+                        <a href="shopping-cart.html"><img src="img/icon/cart.png" alt=""> <span></span></a>
+                        <!-- <div class="price">$0.00</div> -->
                     </div>
                 </div>
             </div>
@@ -128,7 +126,7 @@
         </div>
 
 <!-- Modal Login -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -153,7 +151,7 @@
 </div>
 
     <!-- Sign Up Modal -->
-<div class="modal fade" id="signUpModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="signUpModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -507,10 +505,6 @@
     <script src="js/mixitup.min.js"></script>
     <script src="js/owl.carousel.min.js"></script>
     <script src="js/main.js"></script>
-    <script src="js/product-fetch.js"></script>
-
-
-
 
     <!-- Load dynamic product list -->
 
@@ -522,34 +516,41 @@
     <script>
         // รอให้โหลด DOM เสร็จก่อน
         document.addEventListener('DOMContentLoaded', () => {
-            // หา element ทั้งหมดที่มี class add-cart
             const addCartButtons = document.querySelectorAll('.add-cart');
 
             addCartButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const productId = btn.getAttribute('data-id');
-                    if (!productId) return;
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();  // ป้องกันไม่ให้เกิดการกระทำอื่น ๆ ทันที
 
-                    // เตรียมข้อมูลที่จะส่ง ไปให้ backend
-                    const payload = {
-                        productId: parseInt(productId),
-                        quantity: 1
-                    };
+                    // เช็คสถานะการล็อกอินจากเซิร์ฟเวอร์
+                    const response = await fetch('/api/check-login', {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
 
-                    // ส่ง POST request ด้วย fetch
-                    fetch('/api/cart', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    })
+                    const result = await response.json();
+
+                    if (result.loggedIn) {
+                        // ถ้าผู้ใช้ล็อกอินแล้ว, เพิ่มสินค้าไปที่ตะกร้า
+                        const productId = btn.getAttribute('data-id');
+                        if (!productId) return;
+
+                        const payload = {
+                            productId: parseInt(productId),
+                            quantity: 1
+                        };
+
+                        // ส่งข้อมูลไปที่ backend เพื่อเพิ่มสินค้าลงตะกร้า
+                        fetch('/api/cart', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        })
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                // แสดงข้อความแจ้งเตือนว่าสำเร็จ
-                                // คุณอาจจะแสดง Toast หรือ Alert แบบนี้ได้
                                 alert('✅ เพิ่มสินค้าลงตะกร้าสำเร็จ');
                             } else {
                                 alert('❌ เกิดข้อผิดพลาด: ' + (data.error || 'Unknown'));
@@ -559,9 +560,42 @@
                             console.error(err);
                             alert('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ');
                         });
+                    } else {
+                        // ถ้ายังไม่ได้ล็อกอิน, ให้เปิด login modal
+                        $('#loginModal').modal('show');
+                    }
                 });
             });
         });
+
+        // // แสดงข้อความต้อนรับในหน้า shop.html
+        // document.addEventListener('DOMContentLoaded', async () => {
+        //     const response = await fetch('/api/check-login', {
+        //         method: 'GET',
+        //         headers: { 'Content-Type': 'application/json' }
+        //     });
+
+        //     const result = await response.json();
+
+        //     if (result.loggedIn) {
+        //         // ถ้าผู้ใช้ล็อกอินแล้ว
+        //         document.getElementById('welcome-message').innerText = `Welcome, ${result.user.firstName}`;
+        //     } else {
+        //         // ถ้ายังไม่ล็อกอิน
+        //         document.getElementById('welcome-message').innerText = 'Please log in';
+        //     }
+        // });
+        document.getElementById('authButton').addEventListener('click', (e) => {
+    // ตรวจสอบว่าคลิกเป็น "Sign In" หรือ "Sign Out"
+    if (document.getElementById('authButton').innerText === 'Sign In') {
+        e.preventDefault();
+        loginSubmit();  // เรียกฟังก์ชัน loginSubmit() เมื่อคลิก "Sign In"
+    } else if (document.getElementById('authButton').innerText === 'Sign Out') {
+        e.preventDefault();
+        logout();  // เรียกฟังก์ชัน logout() เมื่อคลิก "Sign Out"
+    }
+});
+
 
         document.getElementById("open-register-modal").addEventListener("click", function(e) {
             e.preventDefault();
@@ -607,40 +641,106 @@
         }
     }
 
+      document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch('/api/check-login', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+
+        // เช็คสถานะการล็อกอิน
+        if (result.loggedIn) {
+            // ถ้าผู้ใช้ล็อกอินแล้ว
+            document.getElementById('authButton').innerText = 'Sign Out';
+            document.getElementById('authButton').setAttribute('href', '#');
+            document.getElementById('authButton').removeAttribute('data-toggle'); // ลบการเปิด modal
+            document.getElementById('authButton').addEventListener('click', logout);
+        } else {
+            // ถ้าผู้ใช้ไม่ได้ล็อกอิน
+            document.getElementById('authButton').innerText = 'Sign In';
+            document.getElementById('authButton').setAttribute('data-toggle', 'modal'); // เปิด modal login
+            document.getElementById('authButton').setAttribute('data-target', '#loginModal'); // เปิด login modal
+        }
+    } catch (error) {
+        console.error("Error checking login status:", error);
+        document.getElementById('authButton').innerText = 'Sign In'; // ให้เป็น Sign In ถ้ามีข้อผิดพลาดในการเช็คสถานะ
+    }
+});
+
+
+//Sign Out
+async function logout() {
+    try {
+        const response = await fetch('/api/logout', {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.text();
+        alert(result);
+
+        document.getElementById('authButton').innerText = 'Sign In';
+        document.getElementById('authButton').setAttribute('data-toggle', 'modal');
+        document.getElementById('authButton').setAttribute('data-target', '#loginModal');
+
+        $('#loginModal').modal('show');
+    
+    } catch (error) {
+        console.error(error);
+        alert("Error during logout");
+    }
+}
+
+
     async function loginSubmit() {
         const loginData = {
-          username: document.getElementById("login-email").value.trim(),
-          password: document.getElementById("login-password").value.trim()
+            username: document.getElementById("login-email").value.trim(),
+            password: document.getElementById("login-password").value.trim()
         }
-        console.log(loginData);
 
         if (!loginData.username || !loginData.password) {
-          return alert("Please enter your email and password");
+            return alert("Please enter your email and password");
         }
+
         try {
-          const response = await fetch('http://localhost:3000/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(loginData)
-          });
+            const response = await fetch('http://localhost:3000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginData)
+            });
 
-          const result = await response.text();
-          alert(result);
-           if (result === "Login successfully.") {
-            window.location.href = "/shop.html";
-        } else {
-            alert(result);
-        }
+            const result = await response.text();
 
+            if (result === "Login successfully.") {
+                // ถ้าล็อกอินสำเร็จ
+                $('#loginModal').modal('hide');  // ปิด modal
+                document.getElementById('authButton').innerText = 'Sign Out';  // เปลี่ยนเป็น Sign Out
+                document.getElementById('authButton').setAttribute('href', '#');
+                document.getElementById('authButton').addEventListener('click', logout);
+
+                alert(result);  // แสดงข้อความการล็อกอินสำเร็จ
+            } else {
+                // ถ้าผิดพลาดจาก server
+                alert(result);
+            }
         } catch (error) {
-          console.error(error);
-          alert("An error occurred while logging in");
+            console.error(error);
+            alert("An error occurred while logging in");
         }
-      }
+    }
+      
+    document.addEventListener("DOMContentLoaded", () => {
+    // ตรวจสอบว่ามีข้อมูลใน localStorage หรือไม่
+    if (!localStorage.getItem('checkoutCart')) {
+      console.log("Shopping cart is empty");
+    } else {
+      // ถ้ามีข้อมูลในตะกร้า ให้รีเซ็ตเป็นค่าว่าง
+      localStorage.setItem('checkoutCart', JSON.stringify([]));
+      console.log("Shopping cart reset.");
+    } });
+
     </script>
 </body>
-
-
-</body>
-
 </html>
