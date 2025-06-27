@@ -43,10 +43,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ ผูก event add-to-cart
     productList.querySelectorAll(".add-cart").forEach(btn => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         e.preventDefault();
         const id = btn.dataset.id;
         console.log("🛒 กดสินค้า ID:", id);
+
+        const response = await fetch('/api/check-login', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+
+        if (result.loggedIn) {
 
         btn.disabled = true;
         btn.textContent = "กำลังเพิ่ม...";
@@ -73,6 +82,9 @@ document.addEventListener("DOMContentLoaded", function () {
           btn.disabled = false;
           btn.textContent = "+ Add To Cart";
         });
+      }else{
+            $('#loginModal').modal('show');
+        }
       });
     });
   }
@@ -87,21 +99,38 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
   // ค้นหาจาก popup
-  if (searchInput) {
-    searchInput.addEventListener("keypress", e => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const keyword = searchInput.value.trim();
-        if (!keyword) return;
+if (searchInput) {
+  searchInput.addEventListener("keypress", e => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const keyword = searchInput.value.trim();
+      if (!keyword) return;
 
-        fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`)
-          .then(res => res.json())
-          .then(renderProducts)
-          .catch(err => {
-            console.error("ค้นหาไม่สำเร็จ:", err);
-            renderProducts([]);
-          });
-      }
-    });
-  }
+      fetch(`/api/search?keyword=${encodeURIComponent(keyword)}`)
+        .then(res => res.json())
+        .then(products => {
+          renderProducts(products);
+
+          // ✅ ปิด popup หน้าดำ
+          const searchModel = document.querySelector(".search-model");
+          if (searchModel) {
+            searchModel.classList.remove("active");
+            searchModel.style.display = "none";
+          }
+          document.body.classList.remove("search-show");
+
+          // ✅ Scroll กลับมาที่ product list
+          const section = document.getElementById("product-list");
+          if (section) {
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        })
+        .catch(err => {
+          console.error("ค้นหาไม่สำเร็จ:", err);
+          renderProducts([]);
+        });
+    }
+  });
+}
+
 });
