@@ -1,32 +1,53 @@
 {
-  "firstName": "Yanaphat",
-  "lastName": "Inkham",
-  "address": "132/2 chaingmai university ",
-  "apartment": "Chaingmai University",
-  "phone": "0903174670",
-  "email": "deeiicamt6@gmail.com",
+  "firstName": "praew",
+  "lastName": "piyapat",
+  "address": "23",
+  "apartment": "",
+  "phone": "0997316490",
+  "email": "piyapat_mai@cmu.ac.th",
   "items": [
     {
       "product_id": 4,
       "name": "Jeans",
       "price": 98.49,
-      "quantity": 2,
-      "total_price": 196.98
+      "quantity": 1,
+      "total_price": 98.49
     },
     {
       "product_id": 3,
       "name": "Shirt hood",
       "price": 60.9,
+      "quantity": 1,
+      "total_price": 60.9
+    },
+    {
+      "product_id": 6,
+      "name": "Shirt Blue",
+      "price": 26.28,
+      "quantity": 1,
+      "total_price": 26.28
+    },
+    {
+      "product_id": 2,
+      "name": "Sneaker Blue",
+      "price": 43.48,
+      "quantity": 1,
+      "total_price": 43.48
+    },
+    {
+      "product_id": 5,
+      "name": "Backpack Pocket",
+      "price": 49.66,
       "quantity": 2,
-      "total_price": 121.8
+      "total_price": 99.32
     },
     {
       "product_id": 1,
       "name": "Blown Jacket",
       "price": 67.24,
-      "quantity": 2,
-      "total_price": 134.48
+      "quantity": 5,
+      "total_price": 336.2
     }
   ],
-  "total": 453.26
+  "total": 664.67
 }
